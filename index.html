@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debuff & Slime Pattern Reference Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .selection-area {
+            padding: 40px;
+            background: white;
+        }
+
+        .selection-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .selector-group {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .selector-group:hover {
+            border-color: #4ecdc4;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .selector-group h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        .debuff-icon {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+        }
+
+        .slime-icon {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        /* Debuff icon row styles */
+        .debuff-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .debuff-option {
+            width: 80px;
+            height: 80px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .debuff-option:hover {
+            border-color: #4ecdc4;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .debuff-option.selected {
+            border-color: #ff6b6b;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .debuff-option .icon-symbol {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+        }
+
+        .debuff-option .icon-label {
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .fire-icon {
+            background: linear-gradient(135deg, #ff4757, #ff6b6b);
+        }
+
+        .ice-icon {
+            background: linear-gradient(135deg, #3742fa, #70a1ff);
+        }
+
+        /* Pattern row styles */
+        .pattern-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .pattern-option {
+            width: 120px;
+            height: 120px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pattern-option:hover {
+            border-color: #4ecdc4;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .pattern-option.selected {
+            border-color: #4ecdc4;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+        }
+
+        .pattern-option .pattern-image {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .pattern-option.selected .pattern-image {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pattern-option .pattern-label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none; /* Hide original selects */
+        }
+
+        .generate-btn {
+            display: block;
+            width: 200px;
+            margin: 0 auto;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-area {
+            padding: 40px;
+            background: #f8f9fa;
+            border-top: 3px solid #4ecdc4;
+            display: none;
+        }
+
+        .results-area.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-header h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .combination-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .combo-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+
+        .combo-debuff {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+        }
+
+        .combo-slime {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .step-image {
+            width: 100%;
+            height: 200px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .step-image.has-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .step-image .fallback-icon {
+            font-size: 4rem;
+            color: #ccc;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .step-description {
+            padding: 20px;
+            text-align: center;
+            color: #555;
+            line-height: 1.6;
+        }
+
+            @media (max-width: 768px) {
+                .debuff-icons {
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 10px;
+                }
+                
+                .debuff-option {
+                    width: 70px;
+                    height: 70px;
+                }
+                
+                .pattern-grid {
+                    flex-direction: column;
+                    align-items: center;
+                }
+                
+                .pattern-option {
+                    width: 100px;
+                    height: 100px;
+                }
+                
+                .header h1 {
+                    font-size: 2rem;
+                }
+                
+                .steps-container {
+                    grid-template-columns: 1fr;
+                }
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Debuff & Slime Reference Tool</h1>
+            <p>Select your debuff type and slime pattern to see the solution steps</p>
+        </div>
+
+        <div class="selection-area">
+            <div class="selection-grid">
+                <div class="selector-group">
+                    <h3><div class="icon debuff-icon"></div>Select Debuff Type</h3>
+                    <div class="debuff-icons">
+                        <div class="debuff-option fire-icon" data-value="fire1">
+                            <div class="icon-symbol" style="background-image: url(https://xivapi.com/i/219000/219245_hr1.png);"></div>
+                            <div class="icon-label">Fire1</div>
+                        </div>
+                        <div class="debuff-option fire-icon" data-value="fire2">
+                            <div class="icon-symbol" img src='./images/fire2-icon.png' alt="Fire 2 Icon"></div>
+                            <div class="icon-label">Fire2</div>
+                        </div>
+                        <div class="debuff-option fire-icon" data-value="fire3">
+                            <img class="icon-symbol" src="https://xivapi.com/i/219000/219247_hr1.png" alt="Fire 3 Icon">
+                            <div class="icon-label">Fire3</div>
+                        </div>
+                        <div class="debuff-option ice-icon" data-value="ice1">
+                            <div class="icon-symbol" style="background-image: url('images/ice1-icon.png');"></div>
+                            <div class="icon-label">Ice1</div>
+                        </div>
+                        <div class="debuff-option ice-icon" data-value="ice2">
+                            <div class="icon-symbol" style="background-image: url('images/ice2-icon.png');"></div>
+                            <div class="icon-label">Ice2</div>
+                        </div>
+                        <div class="debuff-option ice-icon" data-value="ice3">
+                            <div class="icon-symbol" style="background-image: url('images/ice3-icon.png');"></div>
+                            <div class="icon-label">Ice3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selector-group">
+                    <h3><div class="icon slime-icon"></div>Select Slime Pattern</h3>
+                    <div class="pattern-grid">
+                        <div class="pattern-option" data-value="pattern1">
+                            <div class="pattern-image" style="background-image: url('images/pattern1.png');"></div>
+                            <div class="pattern-label">Pattern 1</div>
+                        </div>
+                        <div class="pattern-option" data-value="pattern2">
+                            <div class="pattern-image" style="background-image: url('images/pattern2.png');"></div>
+                            <div class="pattern-label">Pattern 2</div>
+                        </div>
+                        <div class="pattern-option" data-value="pattern3">
+                            <div class="pattern-image" style="background-image: url('images/pattern3.png');"></div>
+                            <div class="pattern-label">Pattern 3</div>
+                        </div>
+                        <div class="pattern-option" data-value="pattern4">
+                            <div class="pattern-image" style="background-image: url('images/pattern4.png');"></div>
+                            <div class="pattern-label">Pattern 4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="generate-btn" id="generateBtn" disabled>Show Solution Steps</button>
+        </div>
+
+        <div class="results-area" id="resultsArea">
+            <div class="results-header">
+                <h2>Solution Steps</h2>
+            </div>
+            
+            <div class="combination-info" id="combinationInfo">
+                <div class="combo-item combo-debuff">
+                    <strong>Debuff:</strong><br>
+                    <span id="selectedDebuff">-</span>
+                </div>
+                <div class="combo-item combo-slime">
+                    <strong>Pattern:</strong><br>
+                    <span id="selectedSlime">-</span>
+                </div>
+            </div>
+
+            <div class="steps-container" id="stepsContainer">
+                <!-- Steps will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generateBtn');
+        const resultsArea = document.getElementById('resultsArea');
+        const selectedDebuff = document.getElementById('selectedDebuff');
+        const selectedSlime = document.getElementById('selectedSlime');
+        const stepsContainer = document.getElementById('stepsContainer');
+
+        // Track selections
+        let currentDebuff = '';
+        let currentPattern = '';
+
+        // Step templates for different combinations
+        const stepTemplates = {
+            fire1: {
+                pattern1: [
+                    { title: "Identify Fire Source", desc: "Locate the primary fire debuff source in pattern 1", icon: "🔍", image: "fire1_pattern1_step1.png" },
+                    { title: "Apply Water Shield", desc: "Use water-based protection against fire1 effects", icon: "💧", image: "fire1_pattern1_step2.png" },
+                    { title: "Navigate Pattern", desc: "Move through pattern 1 safe zones carefully", icon: "🗺️", image: "fire1_pattern1_step3.png" },
+                    { title: "Extinguish Flames", desc: "Complete fire1 suppression sequence", icon: "🧯", image: "fire1_pattern1_step4.png" }
+                ],
+                pattern2: [
+                    { title: "Analyze Fire Spread", desc: "Study how fire1 spreads in pattern 2", icon: "📊", image: "fire1_pattern2_step1.png" },
+                    { title: "Create Firebreaks", desc: "Establish barriers to contain fire1", icon: "🚧", image: "fire1_pattern2_step2.png" },
+                    { title: "Cool Down Zone", desc: "Apply cooling agents in pattern 2 formation", icon: "❄️", image: "fire1_pattern2_step3.png" },
+                    { title: "Secure Area", desc: "Ensure fire1 is completely neutralized", icon: "✅", image: "fire1_pattern2_step4.png" }
+                ],
+                pattern3: [
+                    { title: "Pattern Analysis", desc: "Study fire1 behavior in pattern 3", icon: "🔍", image: "fire1_pattern3_step1.png" },
+                    { title: "Containment Strategy", desc: "Set up containment for pattern 3", icon: "🚧", image: "fire1_pattern3_step2.png" },
+                    { title: "Execute Solution", desc: "Apply fire1 countermeasures", icon: "⚡", image: "fire1_pattern3_step3.png" },
+                    { title: "Verify Results", desc: "Confirm fire1 elimination", icon: "✅", image: "fire1_pattern3_step4.png" }
+                ],
+                pattern4: [
+                    { title: "Pattern Recognition", desc: "Identify fire1 characteristics in pattern 4", icon: "🎯", image: "fire1_pattern4_step1.png" },
+                    { title: "Resource Preparation", desc: "Gather tools for pattern 4 approach", icon: "🎒", image: "fire1_pattern4_step2.png" },
+                    { title: "Systematic Approach", desc: "Execute step-by-step solution", icon: "📋", image: "fire1_pattern4_step3.png" },
+                    { title: "Final Cleanup", desc: "Complete fire1 removal process", icon: "🧹", image: "fire1_pattern4_step4.png" }
+                ]
+            },
+            fire2: {
+                pattern1: [
+                    { title: "Advanced Fire Detection", desc: "Locate fire2 sources in pattern 1", icon: "🔍", image: "fire2_pattern1_step1.png" },
+                    { title: "Enhanced Protection", desc: "Apply stronger shields for fire2", icon: "🛡️", image: "fire2_pattern1_step2.png" },
+                    { title: "Strategic Movement", desc: "Navigate pattern 1 with fire2 considerations", icon: "🗺️", image: "fire2_pattern1_step3.png" },
+                    { title: "Complete Suppression", desc: "Finish fire2 elimination", icon: "🧯", image: "fire2_pattern1_step4.png" }
+                ],
+                pattern2: [
+                    { title: "Fire2 Analysis", desc: "Study fire2 spread in pattern 2", icon: "📊", image: "fire2_pattern2_step1.png" },
+                    { title: "Advanced Barriers", desc: "Create stronger firebreaks for fire2", icon: "🚧", image: "fire2_pattern2_step2.png" },
+                    { title: "Intensive Cooling", desc: "Apply enhanced cooling for fire2", icon: "❄️", image: "fire2_pattern2_step3.png" },
+                    { title: "Area Secured", desc: "Ensure fire2 complete elimination", icon: "✅", image: "fire2_pattern2_step4.png" }
+                ],
+                pattern3: [
+                    { title: "Complex Pattern Study", desc: "Analyze fire2 in pattern 3", icon: "🔍", image: "fire2_pattern3_step1.png" },
+                    { title: "Multi-layer Defense", desc: "Set up advanced containment", icon: "🚧", image: "fire2_pattern3_step2.png" },
+                    { title: "Coordinated Attack", desc: "Execute fire2 countermeasures", icon: "⚡", image: "fire2_pattern3_step3.png" },
+                    { title: "Success Confirmation", desc: "Verify fire2 elimination", icon: "✅", image: "fire2_pattern3_step4.png" }
+                ],
+                pattern4: [
+                    { title: "Master-level Detection", desc: "Identify fire2 in complex pattern 4", icon: "🎯", image: "fire2_pattern4_step1.png" },
+                    { title: "Expert Preparation", desc: "Prepare advanced tools", icon: "🎒", image: "fire2_pattern4_step2.png" },
+                    { title: "Precision Execution", desc: "Execute expert-level solution", icon: "📋", image: "fire2_pattern4_step3.png" },
+                    { title: "Perfect Cleanup", desc: "Complete fire2 removal", icon: "🧹", image: "fire2_pattern4_step4.png" }
+                ]
+            },
+            fire3: {
+                pattern1: [
+                    { title: "Extreme Fire Detection", desc: "Locate fire3 sources in pattern 1", icon: "🔍", image: "fire3_pattern1_step1.png" },
+                    { title: "Maximum Protection", desc: "Deploy strongest shields for fire3", icon: "🛡️", image: "fire3_pattern1_step2.png" },
+                    { title: "Expert Navigation", desc: "Master-level movement through pattern 1", icon: "🗺️", image: "fire3_pattern1_step3.png" },
+                    { title: "Ultimate Suppression", desc: "Complete fire3 elimination", icon: "🧯", image: "fire3_pattern1_step4.png" }
+                ],
+                pattern2: [
+                    { title: "Fire3 Master Analysis", desc: "Expert study of fire3 in pattern 2", icon: "📊", image: "fire3_pattern2_step1.png" },
+                    { title: "Ultimate Barriers", desc: "Create maximum-strength firebreaks", icon: "🚧", image: "fire3_pattern2_step2.png" },
+                    { title: "Extreme Cooling", desc: "Apply maximum cooling power", icon: "❄️", image: "fire3_pattern2_step3.png" },
+                    { title: "Perfect Security", desc: "Ensure complete fire3 elimination", icon: "✅", image: "fire3_pattern2_step4.png" }
+                ],
+                pattern3: [
+                    { title: "Ultimate Pattern Study", desc: "Master analysis of fire3 in pattern 3", icon: "🔍", image: "fire3_pattern3_step1.png" },
+                    { title: "Supreme Defense", desc: "Ultimate containment system", icon: "🚧", image: "fire3_pattern3_step2.png" },
+                    { title: "Perfect Execution", desc: "Master-level countermeasures", icon: "⚡", image: "fire3_pattern3_step3.png" },
+                    { title: "Complete Victory", desc: "Perfect fire3 elimination", icon: "✅", image: "fire3_pattern3_step4.png" }
+                ],
+                pattern4: [
+                    { title: "Legendary Detection", desc: "Ultimate fire3 identification", icon: "🎯", image: "fire3_pattern4_step1.png" },
+                    { title: "Supreme Preparation", desc: "Master-level tool preparation", icon: "🎒", image: "fire3_pattern4_step2.png" },
+                    { title: "Legendary Execution", desc: "Perfect solution execution", icon: "📋", image: "fire3_pattern4_step3.png" },
+                    { title: "Absolute Cleanup", desc: "Complete fire3 mastery", icon: "🧹", image: "fire3_pattern4_step4.png" }
+                ]
+            },
+            ice1: {
+                pattern1: [
+                    { title: "Locate Ice Core", desc: "Find the center of ice1 effect in pattern 1", icon: "🎯", image: "ice1_pattern1_step1.png" },
+                    { title: "Apply Heat Source", desc: "Use thermal energy to counter ice1", icon: "🔥", image: "ice1_pattern1_step2.png" },
+                    { title: "Melt Ice Barriers", desc: "Clear frozen obstacles in pattern 1", icon: "🌡️", image: "ice1_pattern1_step3.png" },
+                    { title: "Restore Warmth", desc: "Complete ice1 thawing process", icon: "☀️", image: "ice1_pattern1_step4.png" }
+                ],
+                pattern2: [
+                    { title: "Ice1 Pattern Study", desc: "Analyze ice1 formation in pattern 2", icon: "📊", image: "ice1_pattern2_step1.png" },
+                    { title: "Thermal Strategy", desc: "Plan heating approach for pattern 2", icon: "🔥", image: "ice1_pattern2_step2.png" },
+                    { title: "Systematic Melting", desc: "Execute ice1 removal sequence", icon: "🌡️", image: "ice1_pattern2_step3.png" },
+                    { title: "Temperature Stable", desc: "Maintain optimal temperature", icon: "☀️", image: "ice1_pattern2_step4.png" }
+                ],
+                pattern3: [
+                    { title: "Complex Ice Analysis", desc: "Study ice1 in pattern 3", icon: "🔍", image: "ice1_pattern3_step1.png" },
+                    { title: "Advanced Heating", desc: "Apply enhanced thermal solution", icon: "🔥", image: "ice1_pattern3_step2.png" },
+                    { title: "Controlled Thaw", desc: "Execute ice1 removal", icon: "⚡", image: "ice1_pattern3_step3.png" },
+                    { title: "Warmth Restored", desc: "Complete ice1 elimination", icon: "✅", image: "ice1_pattern3_step4.png" }
+                ],
+                pattern4: [
+                    { title: "Ice1 Recognition", desc: "Identify ice1 in pattern 4", icon: "🎯", image: "ice1_pattern4_step1.png" },
+                    { title: "Thermal Preparation", desc: "Prepare heating equipment", icon: "🎒", image: "ice1_pattern4_step2.png" },
+                    { title: "Precise Thawing", desc: "Execute controlled ice1 removal", icon: "📋", image: "ice1_pattern4_step3.png" },
+                    { title: "Final Warming", desc: "Complete temperature restoration", icon: "🧹", image: "ice1_pattern4_step4.png" }
+                ]
+            },
+            ice2: {
+                pattern1: [
+                    { title: "Advanced Ice Detection", desc: "Locate ice2 formations in pattern 1", icon: "🎯", image: "ice2_pattern1_step1.png" },
+                    { title: "Enhanced Heating", desc: "Apply stronger thermal energy for ice2", icon: "🔥", image: "ice2_pattern1_step2.png" },
+                    { title: "Heavy-duty Melting", desc: "Break through ice2 barriers", icon: "🌡️", image: "ice2_pattern1_step3.png" },
+                    { title: "Strong Warmth", desc: "Establish lasting heat for ice2", icon: "☀️", image: "ice2_pattern1_step4.png" }
+                ],
+                pattern2: [
+                    { title: "Ice2 Expert Analysis", desc: "Study ice2 formation in pattern 2", icon: "📊", image: "ice2_pattern2_step1.png" },
+                    { title: "Advanced Thermal Plan", desc: "Design heating strategy for ice2", icon: "🔥", image: "ice2_pattern2_step2.png" },
+                    { title: "Intensive Melting", desc: "Execute ice2 removal process", icon: "🌡️", image: "ice2_pattern2_step3.png" },
+                    { title: "Heat Stabilization", desc: "Maintain strong temperature", icon: "☀️", image: "ice2_pattern2_step4.png" }
+                ],
+                pattern3: [
+                    { title: "Expert Ice Study", desc: "Analyze ice2 in complex pattern 3", icon: "🔍", image: "ice2_pattern3_step1.png" },
+                    { title: "Power Heating", desc: "Apply maximum thermal energy", icon: "🔥", image: "ice2_pattern3_step2.png" },
+                    { title: "Strategic Thaw", desc: "Execute ice2 countermeasures", icon: "⚡", image: "ice2_pattern3_step3.png" },
+                    { title: "Heat Victory", desc: "Complete ice2 elimination", icon: "✅", image: "ice2_pattern3_step4.png" }
+                ],
+                pattern4: [
+                    { title: "Master Ice Detection", desc: "Expert ice2 identification", icon: "🎯", image: "ice2_pattern4_step1.png" },
+                    { title: "Pro Thermal Prep", desc: "Prepare advanced heating tools", icon: "🎒", image: "ice2_pattern4_step2.png" },
+                    { title: "Expert Thawing", desc: "Execute professional ice2 removal", icon: "📋", image: "ice2_pattern4_step3.png" },
+                    { title: "Perfect Heating", desc: "Complete ice2 thermal victory", icon: "🧹", image: "ice2_pattern4_step4.png" }
+                ]
+            },
+            ice3: {
+                pattern1: [
+                    { title: "Ultimate Ice Detection", desc: "Locate ice3 formations in pattern 1", icon: "🎯", image: "ice3_pattern1_step1.png" },
+                    { title: "Maximum Heating", desc: "Deploy ultimate thermal power for ice3", icon: "🔥", image: "ice3_pattern1_step2.png" },
+                    { title: "Extreme Melting", desc: "Break through ice3 with maximum force", icon: "🌡️", image: "ice3_pattern1_step3.png" },
+                    { title: "Supreme Warmth", desc: "Establish perfect heat for ice3", icon: "☀️", image: "ice3_pattern1_step4.png" }
+                ],
+                pattern2: [
+                    { title: "Ice3 Master Analysis", desc: "Ultimate study of ice3 in pattern 2", icon: "📊", image: "ice3_pattern2_step1.png" },
+                    { title: "Legendary Thermal Plan", desc: "Master heating strategy for ice3", icon: "🔥", image: "ice3_pattern2_step2.png" },
+                    { title: "Ultimate Melting", desc: "Execute perfect ice3 removal", icon: "🌡️", image: "ice3_pattern2_step3.png" },
+                    { title: "Perfect Heat", desc: "Achieve ultimate temperature", icon: "☀️", image: "ice3_pattern2_step4.png" }
+                ],
+                pattern3: [
+                    { title: "Legendary Ice Study", desc: "Master analysis of ice3 in pattern 3", icon: "🔍", image: "ice3_pattern3_step1.png" },
+                    { title: "Supreme Heating", desc: "Apply legendary thermal power", icon: "🔥", image: "ice3_pattern3_step2.png" },
+                    { title: "Perfect Thaw", desc: "Execute ultimate ice3 solution", icon: "⚡", image: "ice3_pattern3_step3.png" },
+                    { title: "Thermal Mastery", desc: "Achieve complete ice3 victory", icon: "✅", image: "ice3_pattern3_step4.png" }
+                ],
+                pattern4: [
+                    { title: "Legendary Detection", desc: "Ultimate ice3 identification mastery", icon: "🎯", image: "ice3_pattern4_step1.png" },
+                    { title: "Supreme Preparation", desc: "Master-level thermal preparation", icon: "🎒", image: "ice3_pattern4_step2.png" },
+                    { title: "Perfect Execution", desc: "Legendary ice3 removal technique", icon: "📋", image: "ice3_pattern4_step3.png" },
+                    { title: "Absolute Victory", desc: "Complete ice3 thermal mastery", icon: "🧹", image: "ice3_pattern4_step4.png" }
+                ]
+            }
+        };
+
+        // Default steps for combinations not specifically defined
+        const defaultSteps = [
+            { title: "Analyze Situation", desc: "Carefully observe both the debuff effects and slime pattern behavior", icon: "🔍" },
+            { title: "Prepare Counter-measure", desc: "Select appropriate tools and items for this specific combination", icon: "🎒" },
+            { title: "Execute Solution", desc: "Apply the counter-measure following the pattern's rhythm", icon: "⚡" },
+            { title: "Verify Success", desc: "Confirm both debuff removal and pattern neutralization", icon: "✅" }
+        ];
+
+        // Handle debuff selection
+        document.querySelectorAll('.debuff-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all debuff options
+                document.querySelectorAll('.debuff-option').forEach(opt => opt.classList.remove('selected'));
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                currentDebuff = this.dataset.value;
+                checkSelections();
+            });
+        });
+
+        // Handle pattern selection
+        document.querySelectorAll('.pattern-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all pattern options
+                document.querySelectorAll('.pattern-option').forEach(opt => opt.classList.remove('selected'));
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                currentPattern = this.dataset.value;
+                checkSelections();
+            });
+        });
+
+        function checkSelections() {
+            generateBtn.disabled = !(currentDebuff && currentPattern);
+        }
+
+        function generateSteps() {
+            if (!currentDebuff || !currentPattern) return;
+
+            // Update combination info
+            selectedDebuff.textContent = currentDebuff.toUpperCase();
+            selectedSlime.textContent = currentPattern.charAt(0).toUpperCase() + currentPattern.slice(1);
+
+            // Get appropriate steps
+            let steps = defaultSteps;
+            if (stepTemplates[currentDebuff] && stepTemplates[currentDebuff][currentPattern]) {
+                steps = stepTemplates[currentDebuff][currentPattern];
+            } else if (stepTemplates[currentDebuff]) {
+                // Use first available pattern for this debuff
+                const patterns = Object.keys(stepTemplates[currentDebuff]);
+                if (patterns.length > 0) {
+                    steps = stepTemplates[currentDebuff][patterns[0]];
+                }
+            }
+
+            // Generate step cards
+            stepsContainer.innerHTML = '';
+            steps.forEach((step, index) => {
+                const stepCard = document.createElement('div');
+                stepCard.className = 'step-card';
+                
+                // Create image path for step
+                const imagePath = step.image ? `images/steps/${step.image}` : null;
+                const imageStyle = imagePath ? `background-image: url('${imagePath}');` : '';
+                const imageClass = imagePath ? 'has-image' : '';
+                
+                stepCard.innerHTML = `
+                    <div class="step-header">Step ${index + 1}: ${step.title}</div>
+                    <div class="step-image ${imageClass}" style="${imageStyle}">
+                        ${!imagePath ? `<div class="fallback-icon">${step.icon}</div>` : ''}
+                    </div>
+                    <div class="step-description">${step.desc}</div>
+                `;
+                stepsContainer.appendChild(stepCard);
+            });
+
+            // Show results
+            resultsArea.classList.add('active');
+            resultsArea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Event listeners
+        generateBtn.addEventListener('click', generateSteps);
+
+        // Initialize
+        checkSelections();
+    </script>
+</body>
+</html>
